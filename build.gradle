@@ -1,9 +1,7 @@
 plugins {
     id 'java'
+    id "com.vanniktech.maven.publish" version "0.13.0"
 }
-
-group 'eu.descry'
-version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -12,11 +10,19 @@ repositories {
 dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
-    
+
     testImplementation 'org.slf4j:slf4j-api:1.7.30'
     testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 test {
     useJUnitPlatform()
+}
+
+signing {
+    if (project.hasProperty('SIGNING_PRIVATE_KEY') && project.hasProperty('SIGNING_PASSWORD')) {
+        println 'Found signing credentials. Signing...'
+        useInMemoryPgpKeys(project.getProperty('SIGNING_PRIVATE_KEY'), project.getProperty('SIGNING_PASSWORD'))
+        println 'Used useInMemoryPgpKeys()'
+    }
 }
