@@ -1,5 +1,8 @@
 name: Publish Snapshot
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - master
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -12,9 +15,9 @@ jobs:
           java-version: 1.8
       - name: Retrieve version
         run: echo "COMPONENT_VERSION=$(cat gradle.properties | grep -w "VERSION_NAME" | cut -d'=' -f2)" >> $GITHUB_ENV
-      - name: Publish snapshot
+      - name: Upload snapshot
+        if: endsWith(env.COMPONENT_VERSION, '-SNAPSHOT')
         run: ./gradlew uploadArchives --no-daemon --no-parallel
-        if: endsWith($COMPONENT_VERSION, '-SNAPSHOT')
         env:
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
